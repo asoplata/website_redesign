@@ -58,7 +58,9 @@
     ],
     "07_gamma": [
         "7. Simulating Gamma Rhythms",
-        {}
+        {
+            "01_gamma_gui.md": "7.1 GUI Simulation of Gamma Rhythms"
+        }
     ],
     "08_data_to_simulation": [
         "8. From Data to Simulation",
