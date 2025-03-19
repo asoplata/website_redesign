@@ -25,57 +25,62 @@
 
 6. [Calculating and Viewing Power Spectral Density (PSD)](#toc-6)
 
-7. [Comparing model output and recorded data](#toc-7)
+<!-- Currently, commenting out section 7, see note near it for details. -->
+<!-- 7. [Comparing model output and recorded data](#toc-7) -->
 
-8. [Adjusting parameters](#toc-8)
+<!-- 8. [Adjusting parameters](#toc-8) -->
+7. [Adjusting parameters](#toc-8)
 
-9. [Have fun exploring your own data!](#toc-9)
+<!-- 9. [Have fun exploring your own data!](#toc-9) -->
+8. [Have fun exploring your own data!](#toc-9)
 
 <a id="toc-1"></a>
 
 ## 1. Background
 
-In order to understand the workflow and initial parameter sets provided with this tutorial, we must first briefly describe prior studies that led to the creation of the data you will aim to simulate. This tutorial is based on results from [@jones_quantitative_2009] where, using MEG, we recorded spontaneous (pre-stimulus) alpha (7-14 Hz) and beta (15-20 Hz) rhythms that arise as part of the mu-complex from the primary somatosensory cortex (S1) [@jones_quantitative_2009]. ([Figure 1](#figure-1), See also [@ziegler_transformations_2010], [@sherman_neural_2016], [@jones_when_2016].)
+In order to understand the workflow and initial parameter sets provided with this tutorial, we must first briefly describe prior studies that led to the creation of the data you will aim to simulate. This tutorial is based on results from [@jones_quantitative_2009] where, using MEG, we recorded spontaneous (pre-stimulus) alpha (7-14 Hz) and beta (15-29 Hz) rhythms that arise as part of the mu-complex from the primary somatosensory cortex (S1) [@jones_quantitative_2009]. ([Figure 1](#figure-1), See also [@ziegler_transformations_2010], [@sherman_neural_2016], [@jones_when_2016].)
 
 <div class="stylefig">
 ### Figure 1
 ![](https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/textbook/content/06_alpha_beta/images/image03.png)
 <p align="justify">
-**Figure 1 Left:** Spectrogram of spontaneous activity from current dipole source in SI averaged across 100 trials, from an example subject, shows nearly continuous prestimulus alpha and beta oscillations. At time zero, a brief tap was given to the contralateral finger tip and the spontaneous oscillations briefly desynchronized.
+**Figure 1 Left:** Spectrogram of spontaneous activity from current dipole source in SI averaged across 100 trials from an example subject. The spectrogram shows nearly continuous prestimulus alpha and beta oscillations. At time zero, a brief tap was given to the contralateral finger tip, causing the spontaneous oscillations to briefly desynchronize.
 </p>
 <p align="justify">
-**Figure 1 Right:** A closer look at the prestimulus waveform and spectrogram from spontaneous activity during example signal trials, shows that the alpha and beta oscillations occur intermittently and primarily non-overlapping.
+**Figure 1 Right:** A closer look at the prestimulus waveform and spectrogram from spontaneous activity during individual example signal trials. This illustrates that the alpha and beta oscillations occur intermittently and are frequently non-overlapping.
 </p>
 <p align="justify">
 All figures in Figure 1 are from [@jones_quantitative_2009] or related work.
 </p>
 </div>
 
-Our goal was to use our neocortical model to reproduce features of the waveform and spectrogram observed on single unaveraged trials ([Figure 2](#figure-2) top panel, right) where the alpha and beta components emerge briefly and intermittently in time. On any individual trial (i.e., 1 second of spontaneous data), the presence of alpha and beta activity is not time locked and representative of so-called "induced" activity. Seemingly continuous bands of activity occur only when averaging the spectrograms across trials ([Figure 2](#figure-2) top panel, left), and this is due to the fact that the spectrograms values are strictly positive and the alpha and beta events accumulate without cancellation [@jones_when_2016].
+Our goal was to use our neocortical model to reproduce features of the waveform and spectrogram observed on single (un-averaged) trials ([Figure 1](#figure-1), middle and right columns), where the alpha and beta components emerge briefly and intermittently in time. On any individual trial (i.e., 1 second of spontaneous, pre-stimulus data), the presence of alpha and beta activity is not time-locked and is representative of so-called "induced" activity. The alpha and beta bands of activity appear continuous when averaging the spectrograms across trials ([Figure 1](#figure-1), left column), but this is due to the fact that the spectrograms values are strictly positive and the alpha and beta events accumulate without cancellation [@jones_when_2016]. For individual trials, alpha and beta power is simultaneously high only around 50% of the time, as shown in [Figure 2](#figure-2).
 
 <div class="stylefig">
 ### Figure 2
 ![](https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/textbook/content/06_alpha_beta/images/old-image29.png)
 <p align="justify">
-Key features of the spontaneous non-average SI alpha/beta complex include, intermittent transient bouts of alpha/beta activity, a waveform that oscillates around 0 nAm, PSD with peaks in the alpha and beta bands, primarily non-overlapping alpha and beta events, and a symmetric waveform oscillation. The model was able to reproduce each of these features. See [@jones_quantitative_2009].
+**Figure 2**: Key features of the spontaneous non-average SI alpha/beta complex include: intermittent transient bouts of alpha/beta activity, a waveform that oscillates around 0 nAm, power spectral densities (PSD) with peaks in the alpha and beta bands, primarily non-overlapping alpha and beta events, and a symmetric waveform oscillation. The model was able to reproduce each of these features. The subplots in the top row are from experimental MEG data exhibiting these features, while the corresponding subplots in the bottom row are from simulations of the model. See [@jones_quantitative_2009].
 </p>
 </div>
 
-We found that a sequence of exogenous subthreshold excitatory synaptic drive could activate the network in a manner that reproduced important features of the SI rhythms in the model ([Figure 2](#figure-2)). This drive consisted of two nearly-synchronous 10 Hz rhythmic drives that contacted the network through proximal and distal projection pathways ([Figure 3](#figure-3)). The drives were simulated as population "bursts" of action potentials that contacted the network every 100ms with the mean delay between the proximal and distal burst of 0ms. Specifically, as shown schematically in [Figure 3](#figure-3), the population bursts consisted of 10, 2-spike bursts Gaussian distributed in time. We presumed that during such spontaneous activity, these drives may be provided by leminscial and non-lemniscal thalamic nuclei, which contact proximal and distal pyramidal neurons respectively, and they are know to burst fire at ~10 Hz frequencies in spontaneous states ([@jones_thalamic_2001], [@hughes_thalamic_2005]).
+We found that a sequence of exogenous subthreshold excitatory synaptic drive could activate the network in a manner that reproduced important features of the SI rhythms in the model ([Figure 2](#figure-2)). This drive consisted of two nearly-synchronous 10 Hz rhythmic drives that contacted the network through proximal and distal projection pathways ([Figure 3](#figure-3), see also [Textbook Section 2.5: Evoked and Rhythmic Driving Inputs](03_model_assumptions/evoked_and_rhythmic_driving_inputs.html)). The drives were simulated as population "bursts" of action potentials that contacted the network every 100ms with the mean delay between the proximal and distal burst of 0ms. Specifically, as shown schematically in [Figure 3](#figure-3), these 10 population bursts consisted of 2-spike bursts (i.e. spike "doublets"), Gaussian distributed in time. We presumed that during such spontaneous activity, these drives may be provided by leminscial and non-lemniscal thalamic nuclei, which contact proximal and distal pyramidal neurons respectively, and they are know to burst fire at ~10 Hz frequencies in spontaneous states ([@jones_thalamic_2001], [@hughes_thalamic_2005]).
 
 <div class="stylefig">
 ### Figure 3
 ![](https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/textbook/content/06_alpha_beta/images/image04.png)
 <p align="justify">
-Schematic illustration of exogenous 10 Hz burst drive through proximal and distal projection pathways. "Population bursts", consisting of a set number of "burst units" (10, 2-spike bursts shown) drive post-synaptic conductances in the local network with a set frequency (100 ms ISI) and mean delay between proximal and distal.
+**Figure 3**: Schematic illustration of exogenous 10 Hz burst drives through proximal and distal projection pathways. "Population bursts", consisting of a set number of "burst units" (10 instances of 2-spike bursts as shown) drive post-synaptic conductances in the local network with a set frequency (100 ms inter-burst-interval, equal to 10 Hz) and a variable mean delay between proximal and distal drives.
 </p>
 </div>
 
-We assumed that the macroscale rhythms generating the observed alpha and beta activity arose from subthreshold current flow in a large population of neurons, as opposed to being generated by local spiking interaction. As such, the effective strengths of the exogenous driving inputs were tuned so that the cells in the network remained subthreshold (all other parameters were tuned and fixed base on the morphology, physiology and connectivity within layered neocortical circuits, see [@jones_quantitative_2009] for details). The inputs drove subthreshold currents up and down the pyramidal neurons to reproduce accurate waveform and spectrogram features (see [Figure 3](#figure-3)). A scaling factor of 3000 was multiplied by the model waveform to reproduce nAm units comparable to the recorded data, suggesting on the order 200 x 3000 = 600,000 pyramidal neurons contributed to this signal.
+We assumed that the macroscale rhythms generating the observed alpha and beta activity arose from subthreshold current flow in a large population of neurons, as opposed to being generated by local spiking interaction [@zhu_relationship_2009]. As such, the effective strengths of the exogenous driving inputs were tuned so that the cells in the network remained subthreshold (all other parameters were tuned and fixed base on the morphology, physiology and connectivity within layered neocortical circuits, see [@jones_quantitative_2009] for details). The inputs drove subthreshold currents up (proximal) and down (distal) the pyramidal neurons in order to reproduce accurate waveform and spectrogram features (see [Figure 3](#figure-3)). A scaling factor of 3000 was multiplied by the model waveform to reproduce a signal in units of nAm, comparable to the recorded data, suggesting that on the order of 200 x 3000 = 600,000 pyramidal neurons contributed to this signal.
 
-We further found that decreasing the delay between the drives to ~50ms created a pure alpha oscillation, while applying an ~0ms delay caused beta events to emerge and increased the strength of the distal drive, creating stronger beta activity (data not shown; see parameter exploration below). This result led to the novel prediction that brief beta events emerge from a broad proximal drive disrupted by a simultaneous strong distal drive that lasted 50ms (i.e., one beta period). Support for this prediction was found invasively with laminar recordings in mice and monkeys [@sherman_neural_2016].
+We further found that increasing the strength and synchrony of the distal drive created stronger beta activity, but increasing the delay between the drives to ~50ms created a pure alpha oscillation (see [Section 7](#toc-8) below). The former result led to the novel prediction that brief beta events emerge when a broad proximal drive is disrupted by a simultaneous strong distal drive lasting 50ms (i.e., one beta period). Support for this prediction was found invasively with laminar recordings in mice and monkeys [@sherman_neural_2016].
 
-In this tutorial, we will explore parameter changes that illustrate these results. We will walk you step-by-step through simulations with various combinations of rhythmic proximal and distal drives to describe how each contributes to the alpha and beta components of the SI alpha/beta complex rhythm. We will begin by simulating only rhythmic proximal alpha frequency inputs ([Section 3](#toc-3)), followed by simulating only distal alpha frequency inputs ([Section 4](#toc-4)), followed by various combinations of proximal and distal drive to generate alpha and beta rhythms ([Section 5](#toc-5)). We’ll show you how HNN can plot waveforms, time-frequency spectrograms, and power spectral density plots of the simulated data, as well as for imported recorded data.
+In this tutorial, we will explore parameter changes that illustrate these results. We will walk you step-by-step through simulations with various combinations of rhythmic proximal and distal drives to describe how each contributes to the alpha and beta components of the SI alpha/beta complex. We will **not** be simulating evoked responses or how alpha/beta oscillations interact with evoked responses; [click here for our GUI tutorial on simulating evoked-response potentials (ERPs)](../05_erps/erps_in_gui.html).
+
+We will begin by simulating only rhythmic proximal 10 Hz inputs ([Section 3](#toc-3)), followed by simulating only distal 10 Hz inputs ([Section 4](#toc-4)), followed by various combinations of proximal and distal drives to generate combinations of alpha and beta rhythms ([Section 5](#toc-5)). We’ll show you how HNN can plot waveforms, time-frequency spectrograms, and power spectral density plots of the simulated data.
 
 <a id="toc-2"></a>
 
@@ -94,9 +99,28 @@ Alternatively, if you only want to download each individual HNN parameter set fi
 
 ## 3. Simulating Rhythmic Proximal Inputs: Alpha Only
 
-Note that before running/loading new simulations, we need to increase the run time of the simulation. Find the box labeled `tstop (ms)` under the `Simulation` tab and type in `700` as the value. This will enable us to see simulated oscillations as they evolve over longer time periods.
+Begin by starting the HNN GUI. If you are using Google Colab, follow the instructions in the notebook. If you are using a local install of HNN, run the following command from a terminal:
 
-### 3.1 Load/view parameters to define the network structure & to "activate" the network.
+```
+hnn-gui
+```
+
+### 3.1 Setup General Simulation and Visualization Parameters
+
+Note that before running any simulations, we need to change some default parameters of both the simulations and visualizations. The parameters we need to change in the `Simulation` tab, are shown in [Figure 4](#figure-4) below, and are also listed here:
+
+1. Change the `Name` of the simulation to `OnlyRhythmicProx` (or you can change it to whatever you prefer).
+2. Change `tstop (ms)` to `700`. This will increase the length of the simulation to 700 milliseconds, and enable us to see simulated oscillations as they evolve over longer time periods.
+3. Change `Smoothing` to `0`. Without doing this, much of alpha- and beta-frequency content of our signal will be "smoothed out" and not viewable.
+4. Change `Min Spectral Frequency (Hz)` to `5`.
+4. Change `Max Spectral Frequency (Hz)` to `40`. These two changes will make it easier to see the alpha and beta frequency ranges.
+
+<div class="stylefig">
+### Figure 4
+![](https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/textbook/content/06_alpha_beta/images/core-gui-alpha-initial-setup.png)
+</div>
+
+### 3.2 Load/view parameters to define the network structure & to "activate" the network.
 
 As described in the [Background section](#background), low-frequency alpha and beta rhythms can be simulated by a combination of rhythmic subthreshold proximal and distal ~10Hz inputs. Here, we begin by describing the impact of proximal inputs only. An initial parameter set that will simulate the effect of ~10 Hz subthreshold proximal drive is provided in the file
 [OnlyRhythmicProx.json](https://raw.githubusercontent.com/jonescompneurolab/hnn-data/refs/heads/main/network-configurations/OnlyRhythmicProx.json).
@@ -109,19 +133,7 @@ To load the initial parameter set, navigate to the GUI and click the tab labeled
 External drives
 ```
 
-Then inside of the inside of the tab, click the button
-
-```
-Load external drives (0)
-```
-
-And select the file [OnlyRhythmicProx.json](https://raw.githubusercontent.com/jonescompneurolab/hnn-data/refs/heads/main/network-configurations/OnlyRhythmicProx.json) from HNN’s param subfolder or from your local machine.
-
-To view the parameters that "activate" the network via rhythmic proximal input, click the dropdown menu labeled:
-
-```
-bursty1 (proximal)
-```
+This tab is highlighted in [Figure 4](#figure-4) below.
 
 <div class="stylefig">
 <table>
@@ -140,7 +152,21 @@ bursty1 (proximal)
 </table>
 </div>
 
-You should see the values of adjustable parameters displayed as in the dialog boxes below. There are 4 sections, one regulating the timing statistics of the driving input, one regulating the post-synaptic conductances onto the Layer 2/3 neurons, and one regulating the post-synaptic conductances onto the Layer 5 neurons, and one regulating the synaptic delays. We describe adjustable parameters in each dialog box separately.
+Then inside of the inside of the tab, click the button
+
+```
+Load external drives (0)
+```
+
+And select the file [OnlyRhythmicProx.json](https://raw.githubusercontent.com/jonescompneurolab/hnn-data/refs/heads/main/network-configurations/OnlyRhythmicProx.json) which you downloaded previously in [Section 2](#toc-2).
+
+To view the parameters that "activate" the network via rhythmic proximal input, click the dropdown menu labeled:
+
+```
+bursty1 (proximal)
+```
+
+You should now be able to scroll and see the values of adjustable parameters, displayed as in the dialog boxes below in [Figure 5](#figure-5). There are 4 sections, which we will describe in greater detail below.
 
 <div class="stylefig">
 <table>
@@ -159,18 +185,30 @@ You should see the values of adjustable parameters displayed as in the dialog bo
 </table>
 </div>
 
-20250304 stopped here
-(TODO AES, no idea why this wasn't updated as well)
+
+1. General: The first section deals with all properties of the drive not included in other sections, including the timing settings, statistical properties, number of spikes per burst, number of virtual "drive cells", and pseudo-random number generation seed. The rhythmic proximal inputs drive excitatory synapses in the neocortical network in a proximal projection pattern, as shown in descriptions of the model elsewhere in the text, such as [Model Assumptions: 2.5 Evoked and Rhythmic Driving Inputs](../03_model_assumptions/evoked_and_rhythmic_driving_inputs.html). For further details on the connectivity structure of the network, see the Under the 
+
+TODO 
+Hoodsection of the HNN website. Rhythmic proximal input occurs through stochastic, presynaptic bursts of action potentials from a population of bursting cells (set with "Number bursts"; see [Figure 3](#figure-3)) onto postsynaptic neurons of the modelled network. Stochasticity is introduced in two places: the spike train start time for each bursting cell is sampled from a normal distribution with mean "Start time mean (ms)" and standard deviation "Start time stdev (ms)" and the inter-burst intervals for each bursting cell are sampled from a normal distribution of mean $\frac{1}{Burst frequency}$ (e.g., a 100 ms inter-burst interval corresponds to a "Burst frequency" of 10 Hz) and standard deviation "Burst stdev (ms)" (see [Figure 3](#figure-3)). Also note that the number of spikes per burst unit is set with "Spikes/burst" (currently, only values of 1 and 2 with a fixed 10ms delay can be used) and the final stop time for the entire population of rhythmic proximal inputs is set with "Stop time (ms)".
 
 
+2. **AMPA weights**: One regulating the AMPA post-synaptic conductances onto the Layer 2/3 and Layer 5 neurons,
+3. **NMDA weights**: which is analagous to the **AMPA weights** section, but for the NMDA synapses.
+4. **Synaptic delays**:One regulating the synaptic delays.
 
-Timing tab: The rhythmic proximal inputs drive excitatory synapses in the neocortical network in a proximal projection pattern, as shown at the bottom of the dialog box. For further details on the connectivity structure of the network, see the Under the Hoodsection of the HNN website. Rhythmic proximal input occurs through stochastic, presynaptic bursts of action potentials from a population of bursting cells (set with "Number bursts"; see [Figure 3](#figure-3)) onto postsynaptic neurons of the modelled network. Stochasticity is introduced in two places: the spike train start time for each bursting cell is sampled from a normal distribution with mean "Start time mean (ms)" and standard deviation "Start time stdev (ms)" and the inter-burst intervals for each bursting cell are sampled from a normal distribution of mean $\frac{1}{Burst frequency}$ (e.g., a 100 ms inter-burst interval corresponds to a "Burst frequency" of 10 Hz) and standard deviation "Burst stdev (ms)" (see [Figure 3](#figure-3)). Also note that the number of spikes per burst unit is set with "Spikes/burst" (currently, only values of 1 and 2 with a fixed 10ms delay can be used) and the final stop time for the entire population of rhythmic proximal inputs is set with "Stop time (ms)".
 
-Layer 2/3, and Layer 5 tabs: This dialog box allows you to set the postsynaptic conductance of each of the excitatory synapses in the networks. There are AMPA and NMDA receptors on each cell type (pyramidal and basket cells). There is also a delay parameter to control the arrival time of each spike to the network. In this example, the delay to the layer 2/3 cells is 0.1 ms, with a slightly longer delay to the layer 5 cells of 1 ms. For further details on the connectivity structure of the network, see Under the Hood.
+We shall describe adjustable parameters in each GUI section separately.
 
-<a id="toc-3-2"></a>
+[Model Assumptions: 2.5 Evoked and Rhytymic Driving Inputs](../03_model_assumptions/evoked_and_rhythmic_driving_inputs.html)
 
-### 3.2 Run the simulation and visualize net current dipole
+: 
+Layer 2/3, and Layer 5 tabs: This dialog box allows you to set the postsynaptic conductance of each of the excitatory synapses in the networks. There are AMPA and NMDA receptors on each cell type (pyramidal and basket cells). 
+
+There is also a delay parameter to control the arrival time of each spike to the network. In this example, the delay to the layer 2/3 cells is 0.1 ms, with a slightly longer delay to the layer 5 cells of 1 ms. For further details on the connectivity structure of the network, see Under the Hood.
+
+<a id="toc-3-3"></a>
+
+### 3.3 Run the simulation and visualize net current dipole
 
 To run this simulation, navigate to the main GUI window and click:
 ```
@@ -338,11 +376,16 @@ Follow the steps in the previous sections to create a time-frequency spectrogram
 ![](https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/textbook/content/06_alpha_beta/images/AlphaAndBeta_Spect.png)
 </div>
 
-As shown in the green and red histogram in the top panel of the HNN GUI above, with this parameter set, bursts of both proximal and distal input spikes are provided to the network ~10 Hz (i.e., every 100 ms). Due to the stochastic nature of the inputs, there is some variability in the timing and duration of the input bursts such that sometimes they arrive at the same time and sometimes there is a slight offset between them. As a result, intermittent transient alpha and beta events emerge in the time-frequency spectrogram. Alpha events are produced when the inputs occur slightly out of phase and current flow is pushed alternately up and down the dendrites for ~50 ms duration each (set by the length of the bursts inputs). Beta events occur when the burst inputs arrive more synchronously and the upward current flow is disrupted by downward current flow for ~50 ms to effectively cut the oscillation period in half. As such, the relative alpha to beta expression can be controlled by the delay between the inputs and their relative burst strengths. We will detail this further below (see [Section 8](#toc-8) below).
+As shown in the green and red histogram in the top panel of the HNN GUI above, with this parameter set, bursts of both proximal and distal input spikes are provided to the network ~10 Hz (i.e., every 100 ms). Due to the stochastic nature of the inputs, there is some variability in the timing and duration of the input bursts such that sometimes they arrive at the same time and sometimes there is a slight offset between them. As a result, intermittent transient alpha and beta events emerge in the time-frequency spectrogram. Alpha events are produced when the inputs occur slightly out of phase and current flow is pushed alternately up and down the dendrites for ~50 ms duration each (set by the length of the bursts inputs). Beta events occur when the burst inputs arrive more synchronously and the upward current flow is disrupted by downward current flow for ~50 ms to effectively cut the oscillation period in half. As such, the relative alpha to beta expression can be controlled by the delay between the inputs and their relative burst strengths.
+TODO
+We will detail this further below (see [Section 7](#toc-7) below).
+<!-- We will detail this further below (see [Section 8](#toc-8) below). -->
 
 In contrast to the results from only proximal or distal input, since the current in the pyramidal neurons is pushed both upward and downward in this simulation, the current dipole signal oscillates above and below 0 nAm, which qualitatively matches the experimental data (see [Figure 1](#figure-1) and [Figure 2](#figure-2) in [Background](#background)). Additionally, this simulation reproduces the transient nature of the alpha and beta activity and several other features of the waveform and spectrogram can be quantified to show close agreement between model and experimental results (see [Figure 2](#figure-2) above, and [@jones_quantitative_2009] for further details).
 
-We note that here we do not directly compare the spontaneous current dipole waveform to recorded data, as was done in the ERP tutorial with a root mean squared error. This is due to the fact that the spontaneous SI signal we are simulating is not time-locked to alpha or beta events on any given trial, and the stochastic nature of the driving inputs causes variability in the timing of the alpha or beta activity, making it difficult to align recorded data and simulated results. However, a direct comparison can be made between time averaged recorded and simulated signals by comparing power spectral density waveforms. An example of comparison is shown in [Section 7](#toc-7) below.
+We note that here we do not directly compare the spontaneous current dipole waveform to recorded data, as was done in the ERP tutorial with a root mean squared error. This is due to the fact that the spontaneous SI signal we are simulating is not time-locked to alpha or beta events on any given trial, and the stochastic nature of the driving inputs causes variability in the timing of the alpha or beta activity, making it difficult to align recorded data and simulated results. However, a direct comparison can be made between time averaged recorded and simulated signals by comparing power spectral density waveforms.
+
+<!-- An example of comparison is shown in [Section 7](#toc-7) below. -->
 
 ### 5.3 Simulating and averaging multiple trials with jittered start times creates the impression of continuous oscillations
 
@@ -408,7 +451,7 @@ Follow the previous steps from [Section 5.2](#toc-5-2) to create a time-frequenc
 ![](https://raw.githubusercontent.com/jonescompneurolab/jones-website/master/images/textbook/content/06_alpha_beta/images/AlphaAndBetaJitter0_3trials_spect.png)
 </div>
 
-Notice that the input histograms for distal (green) and proximal (red) input accumulated across the 10 trials, now have higher values than before (up to ~20 compared to 5 in [Section 3.2](#toc-3-2)) and the burst inputs are slightly broader on each cycle, since these histograms represent the accumulated activity from 10 simulations, where the standard deviation in the Burst duration across trials is 20 ms. Approximately 10 Hz rhythmicity in the timing of the distal and proximal inputs can be clearly visualized (note also the symmetric profile of the histograms). However, on any individual trial, the coincidence of inputs leading to alpha or beta events displays some variability due to the stochastic parameter value (Burst stdev=20 ms). This is observed in the dipole waveforms shown for each trial (example shown below).
+Notice that the input histograms for distal (green) and proximal (red) input accumulated across the 10 trials, now have higher values than before (up to ~20 compared to 5 in [Section 3.3](#toc-3-3)) and the burst inputs are slightly broader on each cycle, since these histograms represent the accumulated activity from 10 simulations, where the standard deviation in the Burst duration across trials is 20 ms. Approximately 10 Hz rhythmicity in the timing of the distal and proximal inputs can be clearly visualized (note also the symmetric profile of the histograms). However, on any individual trial, the coincidence of inputs leading to alpha or beta events displays some variability due to the stochastic parameter value (Burst stdev=20 ms). This is observed in the dipole waveforms shown for each trial (example shown below).
 
 In the next simulation, we will jitter the start times of rhythmic inputs across trials with the Start time stdev, in addition to a non-zero Burst stdev. This will add additional variability to the timing of the transient alpha and beta events on each trial, and hence produce even more continuous bands of activity in the averaged spectrogram.
 
@@ -479,19 +522,23 @@ The PSD Viewer window shows the net current dipole (bottom panel) and contributi
 
 <a id="toc-7"></a>
 
-## 7. Comparing model output and recorded data
+<!-- Commenting this section out until the issues with carefully loading alpha data from the "S1_ongoing.txt" file are resolved, see https://github.com/jonescompneurolab/hnn-core/issues/617
+-->
+<!-- ## 7. Comparing model output and recorded data -->
 
-TODO Work in progress!
+<!-- TODO Work in progress! -->
 
 <a id="toc-8"></a>
 
-## 8. Adjusting parameters
+<!-- ## 8. Adjusting parameters -->
+## 7. Adjusting parameters
 
 Parameter adjustments will be key to developing and testing hypotheses on the circuit origin of your own low-frequency rhythmic data. HNN is designed so that many of the parameters in the model can be adjusted from the GUI (see the Tour of the GUI tutorial).
 
 Here, we’ll walk through examples of how to adjust several "Rhythmic Proximal/Distal Input" parameters to investigate how they impact the alpha and beta rhythms described above. We end with some suggested exercises for further exploration.
 
-### 8.1 Changing the strength (post-synaptic conductance) and synchrony of the distal drive increases beta activity
+<!-- ### 8.1 Changing the strength (post-synaptic conductance) and synchrony of the distal drive increases beta activity -->
+### 7.1 Changing the strength (post-synaptic conductance) and synchrony of the distal drive increases beta activity
 
 We described above ([Section 5](#toc-5)) that the timing of proximal and distal inputs can lead to either alpha events (when the bursts arrive to the local network out of phase) or beta events (when the bursts arrive in phase).
 
@@ -535,11 +582,13 @@ Next, we will test how these parameter changes affect the simulation. Select the
 
 First, notice that the histogram profile of the distal input bursts (green) are narrower corresponding to more synchronous input than in the prior simulation ([Section 5](#toc-5)). Second, notice that the waveform of the oscillation is different with a sharper downward deflecting signal, due to to the stronger distal input. These deflections increased ~20 Hz beta activity, as seen in the corresponding spectrogram (compare to spectrogram in [Section 5.1](#toc-5-1)). The 20 Hz frequency is set by the duration of the downward current flow, which with this parameter set is approximately 50 ms (see [@sherman_neural_2016] for further details).
 
-### 8.1.1 Exercise for further exploration
+<!-- ### 8.1.1 Exercise for further exploration -->
+### 7.1.1 Exercise for further exploration
 
 Try changing the frequency of the rhythmic distal drive from 10 Hz to 20 Hz. Try other frequencies for the proximal and distal rhythmic drive. How do the rhythms change? See how changes in the Burst stdev effects the rhythms expressed.
 
-### 8.2 Increasing the strength (post-synaptic conductance) of the distal drive further creates high frequency responses due to induced spiking activity
+<!-- ### 8.2 Increasing the strength (post-synaptic conductance) of the distal drive further creates high frequency responses due to induced spiking activity -->
+### 7.2 Increasing the strength (post-synaptic conductance) of the distal drive further creates high frequency responses due to induced spiking activity
 
 Recall that in the above simulations, the strength of the rhythmic proximal and distal inputs were chosen so that the cells remained subthreshold (no spiking). We will now demonstrate what happens if we increase the strength of the inputs far enough to induce spikes. Instead of simulating subthreshold alpha/beta events, we will see that the dipole signals are dominated by higher-frequency events created by spiking activity. We note that the produced waveforms of activity are, to our knowledge, not typically observed in MEG or EEG data, supporting the notion that alpha/beta rhythms are created through subthreshold processes.
 
@@ -571,13 +620,15 @@ Notice that highly synchronous neuronal spiking in each population coincides wit
 
 Hypothesis testing:This simulation demonstrates that HNN can be used to test the limits of physiological variables and to see how, as parameters are varied, simulations results can be similar or dissimilar to experimental data.
 
-### 8.2.1 Exercise for further exploration
+<!-- ### 8.2.1 Exercise for further exploration -->
+### 7.2.1 Exercise for further exploration
 
 View the contribution of Layer 2/3 and Layer 5 to the net current dipole waveform and compare with the spiking activity in each population. How do each contribute? Try also to change the proximal input parameters instead of the distal input parameters.
 
 Adjust one of the parameter regulating the local network connections. What happens?
 
-### 8.3 Increasing the delay between the proximal and distal inputs to anti-phase (50 ms delay) creates continuous alpha oscillations without beta activity
+<!-- ### 8.3 Increasing the delay between the proximal and distal inputs to anti-phase (50 ms delay) creates continuous alpha oscillations without beta activity -->
+### 7.3 Increasing the delay between the proximal and distal inputs to anti-phase (50 ms delay) creates continuous alpha oscillations without beta activity
 
 We mentioned above that, in addition to parameters controlling the strength and synchrony of the distal (or proximal) drive, the relative timing of proximal and distal inputs is an important factor in determining relative alpha and beta expression in the model. Here we will demonstrate that out-of-phase, 10 Hz burst inputs can produce continuous alpha activity without any beta events. For this simulation, load the [AlphaAndBeta.json](https://raw.githubusercontent.com/jonescompneurolab/hnn-data/refs/heads/main/network-configurations/AlphaAndBeta.json) parameter file as described in [Section 5](#toc-5) by clicking Set Parameters From File and selecting the file from HNN’s param subfolder. To view the new parameters, click on the `External drives` tab. Next, in the `bursty1 (proximal)` dropdown menu, change the start time mean from 50 to 100 ms. The timing tabs in the Rhythmic Proximal and Distal Input dialog boxes should look as follows:
 
@@ -611,7 +662,8 @@ Next, we will run the simulation to investigate the impact of this parameter cha
 
 Notice that the histogram profile of the proximal (red) and distal (green) input bursts are generally ½ cycle out-of-phase (antiphase). This rhythmic alteration of proximal followed by distal drive induces alternating subthreshold current flow up and down the pyramidal neuron dendrites to create a continuous alpha oscillation in the current dipole waveform that oscillates around 0 nAm. The period of the oscillation is set by the duration of each burst (~50 ms, controlled in part by Burst stdev) and the 50 ms delay between the inputs on each cycle (due to different start times). The corresponding spectrogram shows continuous nearly pure alpha activity. This type of strong alpha activity is similar to what might be observed over occipital cortex during eyes closed conditions.
 
-### 8.3.1 Exercise for further exploration
+<!-- ### 8.3.1 Exercise for further exploration -->
+### 7.3.1 Exercise for further exploration
 
 Try changing the delay between the proximal and distal drive by varying amounts. What happens to the rhythm expressed?
 
@@ -619,8 +671,10 @@ Can you create a simulation where other frequencies are expressed? How is it cre
 
 <a id="toc-9"></a>
 
-## 9. Have fun exploring your own data!
+<!-- ## 9. Have fun exploring your own data! -->
+## 8. Have fun exploring your own data!
 
-Follow sections 1-8 above using your data and parameter adjustments based on your own hypotheses.
+<!-- Follow sections 1-8 above using your data and parameter adjustments based on your own hypotheses. -->
+Follow sections 1-7 above using your data and parameter adjustments based on your own hypotheses.
 
 ## References
