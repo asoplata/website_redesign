@@ -36,6 +36,10 @@
 
 <a id="toc-1"></a>
 
+TODO beta "event-like"
+
+TODO time for colab single sim
+
 ## 1. Background
 
 In order to understand the workflow and initial parameter sets provided with this tutorial, we must first briefly describe prior studies that led to the creation of the data you will aim to simulate. This tutorial is based on results from [@jones_quantitative_2009] where, using MEG, we recorded spontaneous (pre-stimulus) alpha (7-14 Hz) and beta (15-29 Hz) rhythms that arise as part of the mu-complex from the primary somatosensory cortex (S1) [@jones_quantitative_2009]. ([Figure 1](#figure-1), See also [@ziegler_transformations_2010], [@sherman_neural_2016], [@jones_when_2016].)
@@ -584,12 +588,19 @@ We described above ([Section 5](#toc-5)) that the timing of proximal and distal 
 
 We have also found that other factors that contribute to the prevalence of beta activity are the strengthand synchrony of the distal inputs; beta activity is increased with stronger and more synchronous subthreshold drive, where the beta frequency is set by the duration of the driving bursts (~50ms) ([@jones_quantitative_2009] and [@sherman_neural_2016]). The strength is controlled by the postsynaptic conductance, and the synchrony is controlled by the Burst stdev in the "Rhythmic Distal Inputs" dialog box. We will demonstrate this here.
 
+TODO re-add `AlphaAndBeta.json` load here, and change simulation `Name` to something like `AlphaAndBetaIncrBeta`
+
 Open the `External drives` tab and click on the dropdown menu
  ```
 bursty2 (distal)
 ```
 
+TODO typo ms to Hz
+
 Reduce the Burst stdev (Hz) value from 20 ms to 10 ms. This will create higher synchrony in the timing of the distal input bursts. Under both the Layer 2/3 and Layer 5 tabs, increase the postsynaptic condances weights of the AMPA synapses onto the Layer 2/3 and Layer 5 pyramidal neurons from 5.4e-5 $\mu S$ to 6e-5 $\mu S$. Both of these changes will cause the distal input burst to push a greater amount of current flow down the pyramidal neuron dendrites. The "Rhythmic Distal Input" dialog windows should look as shown below.
+
+TODO 0.00006 or "6e-5" (either works)
+
 
 <div class="stylefig">
 <table>
@@ -632,7 +643,13 @@ Try changing the frequency of the rhythmic distal drive from 10 Hz to 20 Hz. Try
 
 Recall that in the above simulations, the strength of the rhythmic proximal and distal inputs were chosen so that the cells remained subthreshold (no spiking). We will now demonstrate what happens if we increase the strength of the inputs far enough to induce spikes. Instead of simulating subthreshold alpha/beta events, we will see that the dipole signals are dominated by higher-frequency events created by spiking activity. We note that the produced waveforms of activity are, to our knowledge, not typically observed in MEG or EEG data, supporting the notion that alpha/beta rhythms are created through subthreshold processes.
 
+TODO AlphaAndBetaSpiking
+
+TODO ms to Hz typo again
+
 To test this, select the `External drives` tab, open the `bursty2 (distal)` dropdown menu, and change the parameters as follows. Under the timing tab, change the Burst stdev value back to 20 ms. Under both the Layer 2/3 and Layer 5 tabs, increase the postsynaptic conductance weights of the AMPA synapses onto the Layer 2/3 and Layer 5 pyramidal neurons from 6e-5 $\mu S$ to 40e-5 $\mu S$ (a big change that will provide enough current to cause the cells to spike). The "Rhythmic Distal Input" dialog windows should look as shown below.
+
+TODO 0.00040 or "40e-5"
 
 <div class="stylefig">
 ### Figure 24
@@ -670,7 +687,13 @@ Adjust one of the parameter regulating the local network connections. What happe
 <!-- ### 8.3 Increasing the delay between the proximal and distal inputs to anti-phase (50 ms delay) creates continuous alpha oscillations without beta activity -->
 ### 7.3 Increasing the delay between the proximal and distal inputs to anti-phase (50 ms delay) creates continuous alpha oscillations without beta activity
 
-We mentioned above that, in addition to parameters controlling the strength and synchrony of the distal (or proximal) drive, the relative timing of proximal and distal inputs is an important factor in determining relative alpha and beta expression in the model. Here we will demonstrate that out-of-phase, 10 Hz burst inputs can produce continuous alpha activity without any beta events. For this simulation, load the [AlphaAndBeta.json](https://raw.githubusercontent.com/jonescompneurolab/hnn-data/refs/heads/main/network-configurations/AlphaAndBeta.json) parameter file as described in [Section 5](#toc-5) by clicking Set Parameters From File and selecting the file from HNN’s param subfolder. To view the new parameters, click on the `External drives` tab. Next, in the `bursty1 (proximal)` dropdown menu, change the start time mean from 50 to 100 ms. The timing tabs in the Rhythmic Proximal and Distal Input dialog boxes should look as follows:
+We mentioned above that, in addition to parameters controlling the strength and synchrony of the distal (or proximal) drive, the relative timing of proximal and distal inputs is an important factor in determining relative alpha and beta expression in the model. Here we will demonstrate that out-of-phase, 10 Hz burst inputs can produce continuous alpha activity without any beta events. 
+
+# AlphaOnly
+
+For this simulation, load the [AlphaAndBeta.json](https://raw.githubusercontent.com/jonescompneurolab/hnn-data/refs/heads/main/network-configurations/AlphaAndBeta.json) parameter file as described in [Section 5](#toc-5) by clicking Set Parameters From File and selecting the file from HNN’s param subfolder. To view the new parameters, click on the `External drives` tab. Next, in the `bursty1 (proximal)` dropdown menu, change the start time mean from 50 to 100 ms. The timing tabs in the Rhythmic Proximal and Distal Input dialog boxes should look as follows:
+
+# TODO should be distal change, NOT proximal
 
 <div class="stylefig">
 <table>
