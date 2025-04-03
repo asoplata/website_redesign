@@ -92,6 +92,8 @@ We will begin by simulating only rhythmic proximal 10 Hz inputs ([Section 3](#to
 
 Throughout this tutorial, we will be using several different HNN parameter set files. These files are not included in the HNN installation, but instead must be downloaded separately. The easiest way to get them is to download this Github repository: [hnn-data](https://github.com/jonescompneurolab/hnn-data). You can download the files in that repository by clicking on the green "Code" button, then clicking "Download ZIP". Once you have extracted the folder from the ZIP file, all the files you will need for this tutorial will be in the subfolder `network-configurations`.
 
+https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fjonescompneurolab%2Fhnn-data%2Ftree%2Fmain%2Fworkshops%2Falpha_beta_gui_walkthrough
+
 TODO: add Dylan's "desktop-download" link thing here
 
 Alternatively, if you only want to download each individual HNN parameter set file individually, then right click on each of the following links and select "Save Link As" to download them:
